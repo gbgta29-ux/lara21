@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, RefreshCw } from 'lucide-react';
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 type FlowStep = 
   | 'initial'
@@ -322,23 +322,38 @@ export default function Home() {
 
           {flowStep === 'awaiting_pix_payment' && pixData && (
             <div className="p-4 bg-background border-t border-border/20 flex flex-col items-center gap-4">
-              <Image src={`data:image/png;base64,${pixData.qrCode}`} alt="PIX QR Code" width={200} height={200} />
+              {pixData.qrCode ? (
+                  <Image 
+                      src={`data:image/png;base64,${pixData.qrCode}`} 
+                      alt="PIX QR Code" 
+                      width={200} 
+                      height={200}
+                      className="rounded-lg border bg-white"
+                  />
+              ) : (
+                  <div className="w-[200px] h-[200px] bg-muted rounded-lg flex items-center justify-center p-4">
+                      <p className="text-muted-foreground text-sm text-center">QR Code indisponível.</p>
+                  </div>
+              )}
               <div className="w-full space-y-2">
-                <label className="text-xs font-medium text-muted-foreground">PIX Copia e Cola</label>
-                <div className="relative">
-                  <Textarea readOnly value={pixData.pixCopyPaste} className="pr-12 bg-muted h-24 resize-none" />
-                  <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={handleCopyCode}>
-                    <Copy className="h-4 w-4" />
+                  <Input
+                      readOnly
+                      value={pixData.pixCopyPaste}
+                      className="bg-muted w-full text-sm truncate text-center font-mono"
+                      aria-label="Código PIX Copia e Cola"
+                  />
+                  <Button onClick={handleCopyCode} variant="outline" className="w-full">
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copiar código
                   </Button>
-                </div>
               </div>
               <Button
-                onClick={handleCheckPayment}
-                disabled={isCheckingPayment}
-                className="w-full bg-primary text-primary-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-primary/90"
+                  onClick={handleCheckPayment}
+                  disabled={isCheckingPayment}
+                  className="w-full bg-primary text-primary-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-primary/90"
               >
-                {isCheckingPayment && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
-                Já paguei
+                  {isCheckingPayment && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
+                  Já paguei
               </Button>
             </div>
           )}
