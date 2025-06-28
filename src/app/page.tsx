@@ -2,11 +2,16 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { Message } from "@/types/message";
-import { sendMessage } from "@/app/actions";
+import { sendMessage, createPixCharge, checkPaymentStatus, type PixChargeData } from "@/app/actions";
 import ChatHeader from "@/components/chat/chat-header";
 import ChatMessages from "@/components/chat/chat-messages";
 import ChatInput from "@/components/chat/chat-input";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
+import { Copy, RefreshCw } from 'lucide-react';
+import { Textarea } from "@/components/ui/textarea";
 
 type FlowStep = 
   | 'initial'
@@ -19,6 +24,8 @@ type FlowStep =
   | 'awaiting_after_audio_12_response'
   | 'awaiting_after_audio_14_response'
   | 'awaiting_final_button_click'
+  | 'awaiting_pix_payment'
+  | 'payment_confirmed'
   | 'chat_mode';
 
 export default function Home() {
@@ -30,7 +37,11 @@ export default function Home() {
   const [userName, setUserName] = useState('');
   const [city, setCity] = useState('do Brasil');
   const [showFinalButton, setShowFinalButton] = useState(false);
+  const [isCreatingPix, setIsCreatingPix] = useState(false);
+  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  const [pixData, setPixData] = useState<PixChargeData | null>(null);
   const notificationSoundRef = useRef<HTMLAudioElement>(null);
+  const { toast } = useToast();
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
   
@@ -120,22 +131,72 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleCopyCode = () => {
+    if (pixData?.pixCopyPaste) {
+      navigator.clipboard.writeText(pixData.pixCopyPaste);
+      toast({
+        title: "Código PIX copiado!",
+        description: "Agora é só colar no seu aplicativo do banco.",
+      });
+    }
+  };
+
+  const handleCheckPayment = async () => {
+    if (!pixData?.transactionId || isCheckingPayment) return;
+
+    setIsCheckingPayment(true);
+    addMessage({ type: 'text', text: "Já paguei" }, 'user');
+    await showTypingIndicator(2000);
+    playNotificationSound();
+    await delay(500);
+    addMessage({ type: 'text', text: "Ok amor, só um momento que vou verificar... 😍" }, 'bot');
+    
+    await delay(10000);
+
+    const result = await checkPaymentStatus(pixData.transactionId);
+
+    if (result?.status === 'paid') {
+      playNotificationSound();
+      await delay(500);
+      addMessage({ type: 'text', text: "Pagamento confirmado amor. Clica abaixo e vamos gozar na chamada de vídeo." }, 'bot');
+      setFlowStep('payment_confirmed');
+    } else {
+      await playAudioSequence(19, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/19.mp3');
+    }
+    setIsCheckingPayment(false);
+  };
+
   const handleFinalButtonClick = async () => {
     setShowFinalButton(false);
-    
+    setIsCreatingPix(true);
     const userMessage = addMessage({ type: 'text', text: "CLARO 💗" }, 'user');
     
     setMessages((prev) => 
       prev.map(msg => msg.id === userMessage.id ? {...msg, status: 'read'} : msg)
     );
-    await showTypingIndicator(2000);
+    await showTypingIndicator(1000);
+
+    await playAudioSequence(18, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/18.mp3');
     
     playNotificationSound();
     await delay(500);
-    addMessage({ type: 'text', text: "Perfeito! Já te passo as informações de como entrar, amor. 😉" }, 'bot');
+    addMessage({ type: 'text', text: "Perfeito! Já vou gerar o PIX pra você... 😉" }, 'bot');
+    await showTypingIndicator(3000);
     
-    setFlowStep('chat_mode');
-    setShowInput(true);
+    const charge = await createPixCharge();
+    if (charge) {
+      setPixData(charge);
+      setFlowStep('awaiting_pix_payment');
+      playNotificationSound();
+      await delay(500);
+      addMessage({ type: 'text', text: "Prontinho amor, faz o pagamento pra gente continuar..." }, 'bot');
+    } else {
+      playNotificationSound();
+      await delay(500);
+      addMessage({ type: 'text', text: "Ops, não consegui gerar o PIX agora, amor. Tenta de novo em um minutinho." }, 'bot');
+      setShowFinalButton(true);
+    }
+    setIsCreatingPix(false);
   };
 
   const formAction = async (formData: FormData) => {
@@ -160,10 +221,11 @@ export default function Home() {
         break;
 
       case 'awaiting_amor_permission':
+        await showTypingIndicator(1500);
         await playAudioSequence(4, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/4.mp3');
         await delay(2000);
         await playAudioSequence(5, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/5.mp3');
-        await delay(2000);
+        await showTypingIndicator(2000);
         playNotificationSound();
         await delay(500);
         addMessage({ type: 'text', text: "Acho que vai gostar rsrs" }, 'bot');
@@ -171,10 +233,11 @@ export default function Home() {
         break;
         
       case 'awaiting_after_gostar_response':
+        await showTypingIndicator(1500);
         playNotificationSound();
         await delay(500);
         addMessage({ type: 'image', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/essa-.jpg' }, 'bot');
-        await delay(2000);
+        await showTypingIndicator(2000);
         playNotificationSound();
         await delay(500);
         addMessage({ type: 'text', text: "O que você achou bb?? vou mostrar umas mais picantes" }, 'bot');
@@ -182,6 +245,7 @@ export default function Home() {
         break;
 
       case 'awaiting_after_picante_response':
+        await showTypingIndicator(1500);
         await playAudioSequence(8, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/8.mp3');
         await delay(2000);
         await playAudioSequence(9, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/9.mp3');
@@ -191,20 +255,23 @@ export default function Home() {
         break;
 
       case 'awaiting_after_audio_10_response':
+        await showTypingIndicator(1500);
         await playAudioSequence(11, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/11.mp3');
         setFlowStep('awaiting_after_audio_11_response');
         break;
 
       case 'awaiting_after_audio_11_response':
+        await showTypingIndicator(1500);
         await playAudioSequence(12, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/12.mp3');
         setFlowStep('awaiting_after_audio_12_response');
         break;
 
       case 'awaiting_after_audio_12_response':
+        await showTypingIndicator(1500);
         playNotificationSound();
         await delay(500);
         addMessage({ type: 'image', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/salva-e.jpg' }, 'bot');
-        await delay(2000);
+        await showTypingIndicator(2000);
         await playAudioSequence(13, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/13.mp3');
         await delay(2000);
         await playAudioSequence(14, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/14.mp3');
@@ -212,16 +279,17 @@ export default function Home() {
         break;
 
       case 'awaiting_after_audio_14_response':
+        await showTypingIndicator(1500);
         await playAudioSequence(15, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/15.mp3');
         await delay(1000);
         playNotificationSound();
         await delay(500);
         addMessage({ type: 'image', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/IMAGEM.jpg' }, 'bot');
-        await delay(2000);
+        await showTypingIndicator(2000);
         playNotificationSound();
         await delay(500);
         addMessage({ type: 'video', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/Sem-nome-Story.mp4' }, 'bot');
-        await delay(2000);
+        await showTypingIndicator(2000);
         await playAudioSequence(16, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/16.mp3');
         await delay(2000);
         await playAudioSequence(17, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/17.mp3');
@@ -263,12 +331,47 @@ export default function Home() {
             <ChatMessages messages={messages} isLoading={isLoading} autoPlayingAudioId={autoPlayingAudioId} />
           </div>
 
+          {flowStep === 'awaiting_pix_payment' && pixData && (
+            <div className="p-4 bg-background border-t border-border/20 flex flex-col items-center gap-4">
+              <Image src={`data:image/png;base64,${pixData.qrCode}`} alt="PIX QR Code" width={200} height={200} />
+              <div className="w-full space-y-2">
+                <label className="text-xs font-medium text-muted-foreground">PIX Copia e Cola</label>
+                <div className="relative">
+                  <Textarea readOnly value={pixData.pixCopyPaste} className="pr-12 bg-muted h-24 resize-none" />
+                  <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={handleCopyCode}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <Button
+                onClick={handleCheckPayment}
+                disabled={isCheckingPayment}
+                className="w-full bg-primary text-primary-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-primary/90"
+              >
+                {isCheckingPayment && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
+                Já paguei
+              </Button>
+            </div>
+          )}
+
+          {flowStep === 'payment_confirmed' && (
+             <div className="p-4 bg-background border-t border-border/20 flex justify-center">
+              <Button asChild className="w-full bg-accent text-accent-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-accent/90">
+                <Link href="https://clever-florentine-3bbb01.netlify.app/" target="_blank">
+                  Vamos gozar na chamada de vídeo 🔥
+                </Link>
+              </Button>
+            </div>
+          )}
+
           {showFinalButton && (
             <div className="p-4 bg-background border-t border-border/20 flex justify-center">
               <Button
                 onClick={handleFinalButtonClick}
+                disabled={isCreatingPix}
                 className="w-full bg-primary text-primary-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-primary/90"
               >
+                {isCreatingPix && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
                 CLARO 💗
               </Button>
             </div>

@@ -12,3 +12,66 @@ export async function sendMessage(message: string): Promise<GenerateResponseOutp
     return { response: "Desculpe, não consegui processar sua mensagem. Tente novamente mais tarde." };
   }
 }
+
+export interface PixChargeData {
+  qrCode: string;
+  pixCopyPaste: string;
+  transactionId: string;
+}
+
+export async function createPixCharge(): Promise<PixChargeData | null> {
+  try {
+    const response = await fetch('https://api.pushinpay.com.br/api/pix/cashIn', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer 35648|1odgFdRH6MLxbJAkam7zbBxGsktnksRjf8YJ9ffNf6e7baec',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        value: 50,
+        webhook_url: "http://seuservico.com/webhook"
+      }),
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Failed to create PIX charge:", response.status, errorText);
+      return null;
+    }
+
+    const data = await response.json();
+    return {
+      qrCode: data.qr_code_base64,
+      pixCopyPaste: data.br_code,
+      transactionId: data.id,
+    };
+  } catch (error) {
+    console.error("Error creating PIX charge:", error);
+    return null;
+  }
+}
+
+export async function checkPaymentStatus(transactionId: string): Promise<{ status: string } | null> {
+  try {
+    const response = await fetch(`https://api.pushinpay.com.br/api/transactions/${transactionId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer 35648|1odgFdRH6MLxbJAkam7zbBxGsktnksRjf8YJ9ffNf6e7baec',
+      },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Failed to check payment status:", response.status, errorText);
+      return null;
+    }
+    const data = await response.json();
+    // Assuming the status is nested under a 'data' object
+    return { status: data.data.status };
+  } catch (error) {
+    console.error("Error checking payment status:", error);
+    return null;
+  }
+}
