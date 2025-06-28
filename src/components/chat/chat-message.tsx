@@ -29,7 +29,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
     switch (message.type) {
       case 'audio':
         return (
-          <div className="flex w-[250px] items-center gap-2 sm:w-[280px]">
+          <div className="flex items-center gap-2 p-1">
             <Image
                 src="https://imperiumfragrance.shop/wp-content/uploads/2025/06/perfil.jpg"
                 data-ai-hint="woman profile"
@@ -38,7 +38,9 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                 height={40}
                 className="shrink-0 rounded-full"
             />
-            <AudioPlayer src={message.url!} />
+            <div className="w-[240px] sm:w-[270px]">
+              <AudioPlayer src={message.url!} />
+            </div>
           </div>
         );
       case 'image':
@@ -61,13 +63,15 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   return (
     <div className={cn("flex mb-2", isUser ? "justify-end" : "justify-start")}>
       <div className={cn(
-        "rounded-lg p-2 max-w-[85%] md:max-w-[75%] shadow",
+        "rounded-lg shadow",
         isUser ? "bg-whatsapp-user-message" : "bg-white",
-        message.type === 'image' && 'p-1',
-        message.type === 'audio' && 'p-1'
+        message.type === 'image' ? 'p-1' :
+        message.type === 'audio' ? 'p-0' :
+        'p-2',
+        "max-w-[85%] md:max-w-[75%]"
       )}>
         {renderContent()}
-        <div className="flex justify-end items-center mt-1">
+        <div className="flex justify-end items-center mt-1 px-2 pb-1">
           <span className="text-xs text-muted-foreground mr-1">{message.timestamp}</span>
           {isUser && <MessageStatus status={message.status} />}
         </div>
