@@ -1,7 +1,9 @@
 
 export interface Message {
   id: number;
-  text: string;
+  type: 'text' | 'audio' | 'image';
+  text?: string;
+  url?: string;
   sender: 'user' | 'bot';
   timestamp: string;
   status: 'sent' | 'delivered' | 'read';

@@ -8,19 +8,22 @@ import { Mic, ArrowUp, Smile, Paperclip } from 'lucide-react';
 
 interface ChatInputProps {
   formAction: (formData: FormData) => Promise<void>;
-  isLoading: boolean;
+  disabled: boolean;
 }
 
-export default function ChatInput({ formAction, isLoading }: ChatInputProps) {
+export default function ChatInput({ formAction, disabled }: ChatInputProps) {
   const [message, setMessage] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (!isLoading) {
-      setMessage('');
+    if (!disabled) {
+      // Don't clear message when AI is thinking, only when flow is running
+      if (message && !disabled) {
+         setMessage('');
+      }
       formRef.current?.reset();
     }
-  }, [isLoading]);
+  }, [disabled, message]);
   
   const handleFormSubmit = async (formData: FormData) => {
     if (message.trim()) {
@@ -42,7 +45,7 @@ export default function ChatInput({ formAction, isLoading }: ChatInputProps) {
             autoComplete="off"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            disabled={isLoading}
+            disabled={disabled}
           />
           <button type="button" aria-label="Attach file">
             <Paperclip className="text-muted-foreground" />
@@ -51,7 +54,7 @@ export default function ChatInput({ formAction, isLoading }: ChatInputProps) {
         <Button 
           type="submit"
           className="w-12 h-12 rounded-full bg-primary hover:bg-primary/90 shrink-0 shadow-sm"
-          disabled={isLoading}
+          disabled={disabled || !message.trim()}
           aria-label={message.trim() ? 'Enviar mensagem' : 'Gravar áudio'}
         >
           {message.trim() ? <ArrowUp className="text-white" /> : <Mic className="text-white" />}

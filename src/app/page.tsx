@@ -10,26 +10,69 @@ import ChatInput from "@/components/chat/chat-input";
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [initialTime, setInitialTime] = useState('');
+  const [isFlowRunning, setIsFlowRunning] = useState(true);
 
+  const addBotMessage = (message: Omit<Message, 'id' | 'timestamp' | 'status' | 'sender'>) => {
+    setMessages(prev => [...prev, {
+      ...message,
+      id: Date.now() + prev.length,
+      sender: 'bot',
+      timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      status: 'read',
+    }]);
+  };
+  
   useEffect(() => {
-    // Set time on client to prevent hydration mismatch
-    setInitialTime(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+    const runWelcomeFlow = async () => {
+      const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+      
+      setIsFlowRunning(true);
+      setMessages([]);
+
+      await delay(1000);
+
+      // Audio 1
+      setIsLoading(true);
+      await delay(2000);
+      setIsLoading(false);
+      addBotMessage({
+        type: 'audio',
+        url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/1-1.mp3',
+      });
+      await delay(3000);
+
+      // Audio 2
+      setIsLoading(true);
+      await delay(2000);
+      setIsLoading(false);
+      addBotMessage({
+        type: 'audio',
+        url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/2-1.mp3',
+      });
+      await delay(3000);
+
+      // Geolocation Image
+      try {
+        const geoResponse = await fetch('https://get.geojs.io/v1/ip/geo.json');
+        if (!geoResponse.ok) throw new Error('Failed to fetch geo data');
+        const geoData = await geoResponse.json();
+        const city = geoData.city || 'do Brasil';
+        const encodedCity = encodeURIComponent(`de ${city}`);
+        const imageUrl = `https://res.cloudinary.com/dxqmzd84a/image/upload/co_rgb:000000,l_text:roboto_50_bold_normal_left:${encodedCity}/fl_layer_apply,x_50,y_425/Design_sem_nome_12_txxzjl`;
+        
+        addBotMessage({ type: 'image', url: imageUrl });
+
+      } catch (error) {
+        console.error("Geolocation flow error:", error);
+         addBotMessage({ type: 'text', text: 'Seja muito bem-vindo(a)!' });
+      }
+
+      setIsFlowRunning(false);
+    };
+
+    runWelcomeFlow();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (initialTime) {
-      setMessages([
-        {
-          id: 1,
-          text: "Oi, tudo bem? 😊",
-          sender: "bot",
-          timestamp: initialTime,
-          status: "read",
-        },
-      ]);
-    }
-  }, [initialTime]);
 
   const formAction = async (formData: FormData) => {
     const userMessageText = formData.get("message") as string;
@@ -38,6 +81,7 @@ export default function Home() {
     const userMessage: Message = {
       id: Date.now(),
       sender: "user",
+      type: 'text',
       text: userMessageText,
       timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
       status: "sent",
@@ -51,6 +95,7 @@ export default function Home() {
       const botMessage: Message = {
         id: Date.now() + 1,
         sender: "bot",
+        type: 'text',
         text: response,
         timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         status: "read",
@@ -66,6 +111,7 @@ export default function Home() {
       const errorMessage: Message = {
         id: Date.now() + 1,
         sender: "bot",
+        type: 'text',
         text: "Desculpe, ocorreu um erro ao processar sua mensagem.",
         timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         status: "read",
@@ -90,7 +136,7 @@ export default function Home() {
           >
             <ChatMessages messages={messages} isLoading={isLoading} />
           </div>
-          <ChatInput formAction={formAction} isLoading={isLoading} />
+          <ChatInput formAction={formAction} disabled={isLoading || isFlowRunning} />
       </div>
     </div>
   );
