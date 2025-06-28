@@ -8,10 +8,11 @@ import ChatMessage from './chat-message';
 interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
+  loadingText?: string;
   autoPlayingAudioId?: number | null;
 }
 
-export default function ChatMessages({ messages, isLoading, autoPlayingAudioId }: ChatMessagesProps) {
+export default function ChatMessages({ messages, isLoading, loadingText = "Digitando...", autoPlayingAudioId }: ChatMessagesProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export default function ChatMessages({ messages, isLoading, autoPlayingAudioId }
         {isLoading && (
             <div className="flex justify-start mb-2">
             <div className="rounded-lg p-2 px-4 max-w-sm bg-white text-black shadow-sm flex items-end">
-                <span className="text-sm italic text-muted-foreground">Digitando...</span>
+                <span className="text-sm italic text-muted-foreground">{loadingText}</span>
             </div>
             </div>
         )}
