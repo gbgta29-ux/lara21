@@ -33,7 +33,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Digitando...");
   const [autoPlayingAudioId, setAutoPlayingAudioId] = useState<number | null>(null);
-  const [showInput, setShowInput] = useState(false);
+  const [showInput, setShowInput] = useState(true);
   const [flowStep, setFlowStep] = useState<FlowStep>('initial');
   const [userName, setUserName] = useState('');
   const [city, setCity] = useState('do Brasil');
@@ -106,7 +106,7 @@ export default function Home() {
       await delay(3000);
       
       const encodedCity = encodeURIComponent(currentCity);
-      const imageUrl = `https://res.cloudinary.com/dxqmzd84a/image/upload/co_rgb:000000,l_text:roboto_50_bold_normal_left:${encodedCity}/fl_layer_apply,x_50,y_425/Design_sem_nome_12_txxzjl`;
+      const imageUrl = `https://res.cloudinary.com/dxqmzd84a/image/upload/co_rgb:000000,l_text:verdana_45_bold_italic_normal_left:${encodedCity}/fl_layer_apply,x_55,y_-380/Design_sem_nome_4_napbsl`;
       addMessage({ type: 'image', url: imageUrl }, 'bot');
       
       await delay(2000);
@@ -340,5 +340,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
