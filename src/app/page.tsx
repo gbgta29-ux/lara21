@@ -203,9 +203,9 @@ export default function Home() {
       case 'awaiting_after_gostar_response':
         await delay(3000);
         await showLoadingIndicator(3000);
-        addMessage({ type: 'image', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/essa-.jpg' }, 'bot');
+        addMessage({ type: 'image', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/Design-sem-nome-14.jpg' }, 'bot');
         await showLoadingIndicator(3000);
-        addMessage({ type: 'text', text: "O que você achou bb?? vou mostrar umas mais picantes" }, 'bot');
+        addMessage({ type: 'text', text: "O que você achou bb??" }, 'bot');
         setFlowStep('awaiting_after_picante_response');
         break;
 
