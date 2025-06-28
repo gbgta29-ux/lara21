@@ -27,7 +27,7 @@ export async function createPixCharge(): Promise<PixChargeData | null> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        value: 50,
+        value: 1000,
         webhook_url: "http://seuservico.com/webhook"
       }),
       cache: 'no-store',
