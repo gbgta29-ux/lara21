@@ -49,27 +49,37 @@ export default function Home() {
       const audio1Url = 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/1-1.mp3';
       const audio2Url = 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/2-1.mp3';
 
-      // Audio 1
+      // 1. “Gravando áudio...” (delay 2s)
       setIsLoading(true);
       await delay(2000);
       setIsLoading(false);
+      
+      // 2. Tocar áudio 1
       addBotMessage({
         type: 'audio',
         url: audio1Url,
       });
       await playAndAwait(audio1Url);
       
-      // Audio 2
+      // 3. Delay 3s após fim
+      await delay(3000);
+
+      // 4. “Gravando áudio...” (delay 2s)
       setIsLoading(true);
+      await delay(2000);
       setIsLoading(false);
+
+      // 5. Tocar áudio 2
       addBotMessage({
         type: 'audio',
         url: audio2Url,
       });
       await playAndAwait(audio2Url);
+
+      // 6. Delay 3s após fim
       await delay(3000);
 
-      // Geolocation Image
+      // 7. & 8. Geolocation Image
       try {
         const geoResponse = await fetch('https://get.geojs.io/v1/ip/geo.json');
         if (!geoResponse.ok) throw new Error('Failed to fetch geo data');
@@ -96,6 +106,12 @@ export default function Home() {
     const userMessageText = formData.get("message") as string;
     if (!userMessageText.trim()) return;
 
+    // Play sound before state updates to prevent re-render issues
+    if (sendSoundRef.current) {
+        sendSoundRef.current.currentTime = 0;
+        sendSoundRef.current.play().catch(console.error);
+    }
+
     const userMessage: Message = {
       id: Date.now(),
       sender: "user",
@@ -106,11 +122,6 @@ export default function Home() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    
-    if (sendSoundRef.current) {
-        sendSoundRef.current.currentTime = 0;
-        sendSoundRef.current.play().catch(console.error);
-    }
     
     setIsLoading(true);
 
