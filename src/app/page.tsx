@@ -58,8 +58,7 @@ export default function Home() {
         url: audio1Url,
       });
       await playAndAwait(audio1Url);
-      await delay(3000);
-
+      
       // Audio 2
       setIsLoading(true);
       await delay(2000);
