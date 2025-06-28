@@ -101,14 +101,14 @@ export default function AudioPlayer({ src }: AudioPlayerProps) {
   const progress = duration > 0 && isFinite(duration) ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="flex w-full items-center gap-2">
+    <div className="flex w-full items-center gap-3">
       <audio ref={audioRef} src={src} preload="metadata" />
       
       <Button variant="ghost" size="icon" onClick={togglePlayPause} className="h-10 w-10 shrink-0 rounded-full">
         {isPlaying ? <Pause className="h-5 w-5 fill-gray-600 text-gray-600" /> : <Play className="h-5 w-5 fill-gray-600 text-gray-600" />}
       </Button>
 
-      <div className="flex flex-1 flex-col justify-center gap-1">
+      <div className="flex-1 space-y-1.5">
           <Slider
               value={[progress]}
               onValueChange={handleProgressChange}
