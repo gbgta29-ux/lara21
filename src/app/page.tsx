@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -9,6 +10,8 @@ import ChatInput from "@/components/chat/chat-input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { RefreshCw } from 'lucide-react';
+import Image from "next/image";
+import { useToast } from "@/hooks/use-toast";
 
 type FlowStep = 
   | 'initial'
@@ -40,6 +43,7 @@ export default function Home() {
   const [pixData, setPixData] = useState<PixChargeData | null>(null);
   const notificationSoundRef = useRef<HTMLAudioElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const { toast } = useToast();
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
   
@@ -158,7 +162,7 @@ export default function Home() {
     await showLoadingIndicator(3000);
     
     const charge = await createPixCharge();
-    if (charge) {
+    if (charge && charge.pixCopyPaste) {
       setPixData(charge);
       setFlowStep('awaiting_pix_payment');
       addMessage({ type: 'text', text: "Prontinho amor, o valor é só R$10,00. Faz o pagamento pra gente continuar..." }, 'bot');
@@ -180,21 +184,24 @@ export default function Home() {
     switch (flowStep) {
       case 'awaiting_name':
         setUserName(userMessageText);
+        await delay(3000);
         await showLoadingIndicator(3000);
         addMessage({ type: 'text', text: `Adorei seu nome ${userMessageText}, 💗 posso te chamar de amor?` }, 'bot');
         setFlowStep('awaiting_amor_permission');
         break;
 
       case 'awaiting_amor_permission':
+        await delay(3000);
         await showLoadingIndicator(3000, "Gravando áudio...");
         await playAudioSequence(4, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/4.mp3');
         await playAudioSequence(5, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/5.mp3');
         await showLoadingIndicator(3000);
-        addMessage({ type: 'text', text: "Acho que vai gostar rsrs" }, 'bot');
+        addMessage({ type: 'text', text: "Acho que vai gostar rsrs , posso mandar ?" }, 'bot');
         setFlowStep('awaiting_after_gostar_response');
         break;
         
       case 'awaiting_after_gostar_response':
+        await delay(3000);
         await showLoadingIndicator(3000);
         addMessage({ type: 'image', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/essa-.jpg' }, 'bot');
         await showLoadingIndicator(3000);
@@ -203,6 +210,7 @@ export default function Home() {
         break;
 
       case 'awaiting_after_picante_response':
+        await delay(3000);
         await showLoadingIndicator(3000, "Gravando áudio...");
         await playAudioSequence(8, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/8.mp3');
         await playAudioSequence(9, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/9.mp3');
@@ -211,18 +219,21 @@ export default function Home() {
         break;
 
       case 'awaiting_after_audio_10_response':
+        await delay(3000);
         await showLoadingIndicator(3000, "Gravando áudio...");
         await playAudioSequence(11, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/11.mp3');
         setFlowStep('awaiting_after_audio_11_response');
         break;
 
       case 'awaiting_after_audio_11_response':
+        await delay(3000);
         await showLoadingIndicator(3000, "Gravando áudio...");
         await playAudioSequence(12, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/12.mp3');
         setFlowStep('awaiting_after_audio_12_response');
         break;
 
       case 'awaiting_after_audio_12_response':
+        await delay(3000);
         await showLoadingIndicator(3000);
         addMessage({ type: 'image', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/salva-e.jpg' }, 'bot');
         await showLoadingIndicator(3000, "Gravando áudio...");
@@ -232,6 +243,7 @@ export default function Home() {
         break;
 
       case 'awaiting_after_audio_14_response':
+        await delay(3000);
         await showLoadingIndicator(3000, "Gravando áudio...");
         await playAudioSequence(15, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/15.mp3');
         await showLoadingIndicator(3000);
@@ -328,3 +340,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
