@@ -41,7 +41,9 @@ export async function createPixCharge(): Promise<PixChargeData | null> {
     }
 
     const responseData = await response.json();
-    // API response might be nested under a 'data' property.
+    // Adicionando um log para depuração. A resposta da API será impressa no console do servidor.
+    console.log("PIX Charge API Response:", JSON.stringify(responseData, null, 2));
+
     const data = responseData.data || responseData;
     
     // The user's prompt states `qr_code` is the copy-paste string.
