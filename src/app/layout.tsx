@@ -7,7 +7,7 @@ import './globals.css';
 const PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
 
 export const metadata: Metadata = {
-  title: 'SimulaZap',
+  title: 'Conversa Digital',
   description: 'A WhatsApp clone powered by AI',
 };
 
