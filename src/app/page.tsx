@@ -169,7 +169,7 @@ export default function Home() {
 
     if (result?.status === 'paid') {
       fpixelTrack('Purchase', { value: 10.00, currency: 'BRL' });
-      addMessage({ type: 'text', text: "Pagamento confirmado amor. Clica abaixo e vamos gozar na chamada de vídeo." }, 'bot');
+      addMessage({ type: 'text', text: "Pagamento confirmado amor. Clica abaixo para iniciar a chamada de vídeo." }, 'bot');
       setFlowStep('payment_confirmed');
     } else {
       await playAudioSequence(19, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/19.mp3');
@@ -362,8 +362,8 @@ export default function Home() {
           {flowStep === 'payment_confirmed' && (
              <div className="p-4 bg-background border-t border-border/20 flex justify-center">
               <Button asChild className="w-full bg-accent text-accent-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-accent/90">
-                <Link href="https://www.youtube.com/results?search_query=polling+como+fazer+pagamento" target="_blank">
-                  Vamos gozar na chamada de vídeo 🔥
+                <Link href="https://studio--chamada-dkhvg.us-central1.hosted.app" target="_blank">
+                  Iniciar chamada de vídeo
                 </Link>
               </Button>
             </div>
