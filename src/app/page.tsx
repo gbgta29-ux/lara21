@@ -46,6 +46,29 @@ export default function Home() {
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
   
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j")) ||
+        (e.ctrlKey && (e.key === "U" || e.key === "u")) ||
+        (e.ctrlKey && (e.key === "S" || e.key === "s"))
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   const playNotificationSound = () => {
     notificationSoundRef.current?.play().catch(console.error);
   }
@@ -276,7 +299,7 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-[#111B21] flex items-center justify-center h-screen font-body">
+    <div className="bg-[#111B21] flex items-center justify-center h-screen font-body select-none">
       <div className="w-full h-dvh sm:w-[450px] sm:h-[95vh] sm:max-h-[900px] flex flex-col bg-background shadow-2xl">
           <ChatHeader />
           <div 
