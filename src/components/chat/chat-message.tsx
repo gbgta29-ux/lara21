@@ -61,6 +61,10 @@ export default function ChatMessage({ message, isAutoPlaying = false }: ChatMess
               <p className="font-semibold text-sm">PIX Copia e Cola</p>
               <p className="text-xs text-muted-foreground">Clique no botão para copiar o código.</p>
             </div>
+            <div className="border-t border-b border-border/20 py-2 my-2 text-center">
+              <p className="text-sm text-muted-foreground">Valor a pagar</p>
+              <p className="text-2xl font-bold text-primary">R$ 10,00</p>
+            </div>
             <div className="w-full space-y-2">
                 <p className="bg-muted w-full text-xs text-left font-mono p-2 rounded-md break-all">{message.pixCopyPaste}</p>
                 <Button onClick={() => handleCopyCode(message.pixCopyPaste!)} variant="outline" className="w-full">
