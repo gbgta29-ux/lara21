@@ -109,17 +109,8 @@ export default function Home() {
 
   useEffect(() => {
     const runWelcomeFlow = async () => {
-      let currentCity = 'do Brasil';
-      try {
-        const geoResponse = await fetch('https://get.geojs.io/v1/ip/geo.json');
-        if (geoResponse.ok) {
-          const geoData = await geoResponse.json();
-          currentCity = geoData.city || 'do Brasil';
-          setCity(currentCity);
-        }
-      } catch (error) {
-        console.error("Geolocation fetch error:", error);
-      }
+      let currentCity = 'São Paulo';
+      setCity(currentCity);
       
       await showLoadingIndicator(2000, "Gravando áudio...");
       await playAudioSequence(1, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/1-1.mp3');
