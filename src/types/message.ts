@@ -9,4 +9,5 @@ export interface Message {
   status: 'sent' | 'delivered' | 'read';
   onEnded?: () => void;
   pixCopyPaste?: string;
+  value?: number;
 }

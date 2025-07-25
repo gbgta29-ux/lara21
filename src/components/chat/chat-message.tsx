@@ -63,7 +63,9 @@ export default function ChatMessage({ message, isAutoPlaying = false }: ChatMess
             </div>
             <div className="border-t border-b border-border/20 py-2 my-2 text-center">
               <p className="text-sm text-muted-foreground">Valor a pagar</p>
-              <p className="text-2xl font-bold text-primary">R$ 10,00</p>
+              <p className="text-2xl font-bold text-primary">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(message.value || 0)}
+              </p>
             </div>
             <div className="w-full space-y-2">
                 <p className="bg-muted w-full text-xs text-left font-mono p-2 rounded-md break-all">{message.pixCopyPaste}</p>

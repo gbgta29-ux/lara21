@@ -17,7 +17,7 @@ export interface PixChargeData {
   transactionId: string;
 }
 
-export async function createPixCharge(): Promise<PixChargeData | null> {
+export async function createPixCharge(value: number): Promise<PixChargeData | null> {
   try {
     const response = await fetch('https://api.pushinpay.com.br/api/pix/cashIn', {
       method: 'POST',
@@ -27,7 +27,7 @@ export async function createPixCharge(): Promise<PixChargeData | null> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        value: 1000,
+        value: value, // Value in cents
         webhook_url: "http://seuservico.com/webhook"
       }),
       cache: 'no-store',

@@ -26,7 +26,10 @@ type FlowStep =
   | 'awaiting_after_audio_14_response'
   | 'awaiting_pix_confirmation_response'
   | 'awaiting_pix_payment'
-  | 'payment_confirmed'
+  | 'payment_confirmed_awaiting_upsell_choice'
+  | 'awaiting_upsell_pix_payment'
+  | 'upsell_payment_confirmed'
+  | 'flow_complete_video_only'
   | 'chat_mode';
 
 export default function Home() {
@@ -41,9 +44,9 @@ export default function Home() {
   const [isCreatingPix, setIsCreatingPix] = useState(false);
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
   const [pixData, setPixData] = useState<PixChargeData | null>(null);
+  const [upsellPixData, setUpsellPixData] = useState<PixChargeData | null>(null);
   const [isStarted, setIsStarted] = useState(false);
   const notificationSoundRef = useRef<HTMLAudioElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
@@ -51,7 +54,6 @@ export default function Home() {
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S
       if (
         e.key === "F12" ||
         (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j")) ||
@@ -160,27 +162,68 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStarted]);
 
-  const handleCheckPayment = async () => {
-    if (!pixData?.transactionId || isCheckingPayment) return;
+  const handleCheckPayment = async (txId: string, type: 'initial' | 'upsell') => {
+    if (!txId || isCheckingPayment) return;
 
-    addMessage({ type: 'text', text: "Já paguei" }, 'user');
+    if (type === 'initial') {
+      addMessage({ type: 'text', text: "Já paguei" }, 'user');
+    } else {
+      addMessage({ type: 'text', text: "Paguei o número, amor!" }, 'user');
+    }
+    
     setIsCheckingPayment(true);
     await showLoadingIndicator(2000);
     addMessage({ type: 'text', text: "Ok amor, só um momento que vou verificar... 😍" }, 'bot');
     
     await delay(10000);
 
-    const result = await checkPaymentStatus(pixData.transactionId);
+    const result = await checkPaymentStatus(txId);
 
     if (result?.status === 'paid') {
-      fpixelTrack('Purchase', { value: 10.00, currency: 'BRL' });
-      addMessage({ type: 'text', text: "Pagamento confirmado amor. Clica abaixo para iniciar a chamada de vídeo." }, 'bot');
-      setFlowStep('payment_confirmed');
+      if (type === 'initial') {
+        fpixelTrack('Purchase', { value: 10.00, currency: 'BRL' });
+        addMessage({ type: 'text', text: "Pagamento confirmado amor!" }, 'bot');
+        await showLoadingIndicator(2000, "Gravando áudio...");
+        await playAudioSequence(20, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/ElevenLabs_2025-07-25T23_51_20_Keren-Young-Brazilian-Female_pvc_sp110_s30_sb30_v3.mp3');
+        addMessage({ type: 'text', text: "Você vai querer meu número pessoal, amor? Custa só mais R$15,00." }, 'bot');
+        setFlowStep('payment_confirmed_awaiting_upsell_choice');
+      } else { // upsell
+        fpixelTrack('Purchase', { value: 25.00, currency: 'BRL' }); // R$10 + R$15
+        addMessage({ type: 'text', text: "Confirmado, bebê! Agora sim, podemos conversar no privado. Clica no botão abaixo para me chamar no WhatsApp e também para nossa chamada de vídeo. 😘" }, 'bot');
+        setFlowStep('upsell_payment_confirmed');
+      }
     } else {
       await playAudioSequence(19, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/19.mp3');
     }
     setIsCheckingPayment(false);
   };
+
+  const handleUpsellChoice = async (choice: 'yes' | 'no') => {
+    setFlowStep('initial'); // Disable buttons
+    if (choice === 'yes') {
+        addMessage({ type: 'text', text: 'Sim, eu quero!' }, 'user');
+        setIsCreatingPix(true);
+        await showLoadingIndicator(2000);
+        addMessage({ type: 'text', text: 'Oba! Sabia que você ia querer, amor. Vou gerar o PIX de R$15,00 pra você.' }, 'bot');
+        await showLoadingIndicator(3000);
+        const charge = await createPixCharge(1500);
+        if (charge && charge.pixCopyPaste) {
+            setUpsellPixData(charge);
+            addMessage({ type: 'pix', sender: 'bot', pixCopyPaste: charge.pixCopyPaste, value: 15 });
+            setFlowStep('awaiting_upsell_pix_payment');
+        } else {
+            addMessage({ type: 'text', text: "Ops, não consegui gerar o PIX agora, amor. Tenta de novo em um minutinho." }, 'bot');
+            setFlowStep('payment_confirmed_awaiting_upsell_choice');
+        }
+        setIsCreatingPix(false);
+
+    } else {
+        addMessage({ type: 'text', text: 'Não, obrigado' }, 'user');
+        await showLoadingIndicator(2000);
+        addMessage({ type: 'text', text: 'Tudo bem, amor. Sem problemas! Podemos fazer só a chamada de vídeo então. Clica no botão abaixo pra gente começar. 😍' }, 'bot');
+        setFlowStep('flow_complete_video_only');
+    }
+  }
 
   const formAction = async (formData: FormData) => {
     const userMessageText = formData.get("message") as string;
@@ -281,13 +324,13 @@ export default function Home() {
         addMessage({ type: 'text', text: "vou mandar meu pix pra você bb... 😍" }, 'bot');
         await showLoadingIndicator(3000);
         
-        const charge = await createPixCharge();
+        const charge = await createPixCharge(1000);
         if (charge && charge.pixCopyPaste) {
           fpixelTrack('InitiateCheckout', { value: 10.00, currency: 'BRL' });
           setPixData(charge);
           setFlowStep('awaiting_pix_payment');
           addMessage({ type: 'text', text: "Prontinho amor, o valor é só R$10,00. Faz o pagamento pra gente gozar na chamada de vídeo..." }, 'bot');
-          addMessage({ type: 'pix', sender: 'bot', pixCopyPaste: charge.pixCopyPaste });
+          addMessage({ type: 'pix', sender: 'bot', pixCopyPaste: charge.pixCopyPaste, value: 10 });
         } else {
           addMessage({ type: 'text', text: "Ops, não consegui gerar o PIX agora, amor. Tenta de novo em um minutinho." }, 'bot');
           setShowInput(true); 
@@ -341,15 +384,21 @@ export default function Home() {
             <ChatMessages messages={messages} isLoading={isLoading} loadingText={loadingText} autoPlayingAudioId={autoPlayingAudioId} />
           </div>
 
-          {flowStep === 'awaiting_pix_payment' && (
+          {(flowStep === 'awaiting_pix_payment' || flowStep === 'awaiting_upsell_pix_payment') && (
             <div className="p-4 bg-background border-t border-border/20 flex flex-col items-center gap-4">
               <div className="flex items-center text-sm text-muted-foreground">
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                 <span>Aguardando pagamento...</span>
               </div>
               <Button
-                  onClick={handleCheckPayment}
-                  disabled={isCheckingPayment || !pixData}
+                  onClick={() => {
+                    if (flowStep === 'awaiting_pix_payment' && pixData) {
+                      handleCheckPayment(pixData.transactionId, 'initial');
+                    } else if (flowStep === 'awaiting_upsell_pix_payment' && upsellPixData) {
+                      handleCheckPayment(upsellPixData.transactionId, 'upsell');
+                    }
+                  }}
+                  disabled={isCheckingPayment || (flowStep === 'awaiting_pix_payment' && !pixData) || (flowStep === 'awaiting_upsell_pix_payment' && !upsellPixData)}
                   className="w-full bg-primary text-primary-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-primary/90"
               >
                   {isCheckingPayment ? (
@@ -364,7 +413,25 @@ export default function Home() {
             </div>
           )}
 
-          {flowStep === 'payment_confirmed' && (
+          {flowStep === 'payment_confirmed_awaiting_upsell_choice' && (
+            <div className="p-4 bg-background border-t border-border/20 flex flex-col sm:flex-row items-center gap-3">
+               <Button
+                  onClick={() => handleUpsellChoice('yes')}
+                  className="w-full bg-accent text-accent-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-accent/90"
+              >
+                  Sim, eu quero!
+              </Button>
+               <Button
+                  onClick={() => handleUpsellChoice('no')}
+                  variant="outline"
+                  className="w-full font-bold text-lg py-6 rounded-full shadow-lg"
+              >
+                  Não, obrigado
+              </Button>
+            </div>
+          )}
+          
+          {flowStep === 'flow_complete_video_only' && (
              <div className="p-4 bg-background border-t border-border/20 flex justify-center">
               <Button asChild className="w-full bg-accent text-accent-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-accent/90">
                 <Link href="https://studio--chamada-dkhvg.us-central1.hosted.app" target="_blank">
@@ -374,10 +441,20 @@ export default function Home() {
             </div>
           )}
 
+          {flowStep === 'upsell_payment_confirmed' && (
+             <div className="p-4 bg-background border-t border-border/20 flex justify-center">
+              <Button asChild className="w-full bg-accent text-accent-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-accent/90">
+                <Link href="https://api.whatsapp.com/send/?phone=4399540418&text=Oiii+Valesca+%EF%BF%BD%0AAcabei+de+fazer+o+pagamento+da+chamadinha+de+v%C3%ADdeo+e+do+seu+n%C3%BAmero+pessoal+%EF%BF%BD%0AT%C3%B4+&type=phone_number&app_absent=0" target="_blank">
+                  Iniciar chamada e conversa
+                </Link>
+              </Button>
+            </div>
+          )}
+
+
           {showInput && <ChatInput formAction={formAction} disabled={isLoading || isCreatingPix} />}
           <audio ref={notificationSoundRef} src="https://imperiumfragrance.shop/wp-content/uploads/2025/06/adew.mp3" preload="auto" />
       </div>
     </div>
   );
 }
-
