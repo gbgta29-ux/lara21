@@ -141,13 +141,13 @@ export default function Home() {
       addMessage({ type: 'image', url: imageUrl }, 'bot');
       
       await delay(2000);
-      addMessage({ type: 'text', text: "Fotinha de agora meu bem 😍" }, 'bot');
+      addMessage({ type: 'text', text: "Essa foto eu tirei hoje mais cedo ❤🔥" }, 'bot');
       
       await showLoadingIndicator(2000, "Gravando áudio...");
-      await playAudioSequence(3, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/3-1.mp3');
+      await playAudioSequence(3, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/3.mp3');
 
       await delay(2000);
-      addMessage({ type: 'text', text: `E moro em ${currentCity}` }, 'bot');
+      addMessage({ type: 'text', text: `E estou morando em ${currentCity}` }, 'bot');
       
       await delay(2000);
       addMessage({ type: 'text', text: "Qual seu nome, bb? 💗" }, 'bot');
@@ -458,6 +458,8 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
 
