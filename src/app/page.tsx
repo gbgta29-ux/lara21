@@ -272,9 +272,8 @@ export default function Home() {
       case 'awaiting_after_picante_response':
         await delay(3000);
         await showLoadingIndicator(3000, "Gravando áudio...");
-        await playAudioSequence(8, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/8.mp3');
-        await playAudioSequence(9, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/9.mp3');
-        await playAudioSequence(10, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/10.mp3');
+        await playAudioSequence(6, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/6.mp3');
+        await playAudioSequence(7, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/7.mp3');
         setFlowStep('awaiting_after_audio_10_response');
         setShowInput(true);
         break;
