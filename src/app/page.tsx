@@ -21,7 +21,6 @@ type FlowStep =
   | 'awaiting_after_gostar_response'
   | 'awaiting_after_picante_response'
   | 'awaiting_after_audio_10_response'
-  | 'awaiting_after_audio_11_response'
   | 'awaiting_after_audio_12_response'
   | 'awaiting_after_audio_14_response'
   | 'awaiting_pix_confirmation_response'
@@ -169,6 +168,26 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStarted]);
 
+  const handleCreatePix = async () => {
+    setIsCreatingPix(true);
+    addMessage({ type: 'text', text: "vou mandar meu pix pra você bb... 😍" }, 'bot');
+    await showLoadingIndicator(3000);
+    
+    const charge = await createPixCharge(50);
+    if (charge && charge.pixCopyPaste) {
+      fpixelTrack('InitiateCheckout', { value: 0.50, currency: 'BRL' });
+      setPixData(charge);
+      setFlowStep('awaiting_pix_payment');
+      addMessage({ type: 'text', text: "Prontinho amor, o valor é só R$0,50. Faz o pagamento pra gente gozar na chamada de vídeo..." }, 'bot');
+      addMessage({ type: 'pix', sender: 'bot', pixCopyPaste: charge.pixCopyPaste, value: 0.50 });
+    } else {
+      addMessage({ type: 'text', text: "Ops, não consegui gerar o PIX agora, amor. Tenta de novo em um minutinho." }, 'bot');
+      setFlowStep('awaiting_after_audio_14_response');
+      setShowInput(true); 
+    }
+    setIsCreatingPix(false);
+  };
+
   const handleCheckPayment = async (txId: string, type: 'initial' | 'upsell') => {
     if (!txId || isCheckingPayment) return;
 
@@ -311,33 +330,13 @@ export default function Home() {
         await playAudioSequence(15, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/ElevenLabs_2025-07-29T02_35_12_Keren-Young-Brazilian-Female_pvc_sp110_s30_sb30_v3.mp3');
         await playAudioSequence(16, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/ElevenLabs_2025-07-29T02_40_26_Keren-Young-Brazilian-Female_pvc_sp110_s30_sb30_v3.mp3');
         await playAudioSequence(17, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/ElevenLabs_2025-07-25T22_43_08_Keren-Young-Brazilian-Female_pvc_sp110_s30_sb30_v3.mp3');
-        setFlowStep('awaiting_pix_confirmation_response');
-        setShowInput(true);
+        await handleCreatePix();
         break;
 
       case 'awaiting_pix_confirmation_response':
-        setIsCreatingPix(true);
-        
-        await showLoadingIndicator(1000, "Gravando áudio...");
-        await playAudioSequence(18, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/18.mp3');
-        
-        addMessage({ type: 'text', text: "vou mandar meu pix pra você bb... 😍" }, 'bot');
-        await showLoadingIndicator(3000);
-        
-        const charge = await createPixCharge(50);
-        if (charge && charge.pixCopyPaste) {
-          fpixelTrack('InitiateCheckout', { value: 0.50, currency: 'BRL' });
-          setPixData(charge);
-          setFlowStep('awaiting_pix_payment');
-          addMessage({ type: 'text', text: "Prontinho amor, o valor é só R$0,50. Faz o pagamento pra gente gozar na chamada de vídeo..." }, 'bot');
-          addMessage({ type: 'pix', sender: 'bot', pixCopyPaste: charge.pixCopyPaste, value: 0.50 });
-        } else {
-          addMessage({ type: 'text', text: "Ops, não consegui gerar o PIX agora, amor. Tenta de novo em um minutinho." }, 'bot');
-          setShowInput(true); 
-        }
-        setIsCreatingPix(false);
+        // This case is now handled by the end of 'awaiting_after_audio_14_response'
         break;
-
+      
       case 'chat_mode':
         try {
           await showLoadingIndicator(1500);
