@@ -299,8 +299,8 @@ export default function Home() {
         await showLoadingIndicator(2000);
         addMessage({ type: 'video', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/111111111.mp4' }, 'bot');
         await showLoadingIndicator(3000, "Gravando áudio...");
-        await playAudioSequence(13, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/13.mp3');
-        await playAudioSequence(14, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/14.mp3');
+        await playAudioSequence(13, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/ElevenLabs_2025-07-29T02_14_20_Keren-Young-Brazilian-Female_pvc_sp110_s30_sb30_v3.mp3');
+        addMessage({ type: 'text', text: "eae bb bora chamadinha então ? 🔥" }, 'bot');
         setFlowStep('awaiting_after_audio_14_response');
         setShowInput(true);
         break;
@@ -463,6 +463,8 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
 
