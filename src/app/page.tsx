@@ -283,6 +283,9 @@ export default function Home() {
         await showLoadingIndicator(3000, "Gravando áudio...");
         await playAudioSequence(10, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/10.mp3');
 
+        await delay(2000);
+        addMessage({ type: 'text', text: "quer ver minha bucetinha amorzinho ??" }, 'bot');
+
         setFlowStep('awaiting_after_audio_12_response');
         setShowInput(true);
         break;
@@ -458,6 +461,8 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
 
