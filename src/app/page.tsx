@@ -308,14 +308,9 @@ export default function Home() {
       case 'awaiting_after_audio_14_response':
         await delay(3000);
         await showLoadingIndicator(3000, "Gravando áudio...");
-        await playAudioSequence(15, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/15.mp3');
-        await showLoadingIndicator(3000);
-        addMessage({ type: 'image', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/Design-sem-nome-15.jpg' }, 'bot');
-        await showLoadingIndicator(3000);
-        addMessage({ type: 'video', url: 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/JoinUs-@RisqueMega-163.mp4' }, 'bot');
-        await showLoadingIndicator(3000, "Gravando áudio...");
-        await playAudioSequence(16, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/16.mp3');
-        await playAudioSequence(17, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/17.mp3');
+        await playAudioSequence(15, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/ElevenLabs_2025-07-29T02_35_12_Keren-Young-Brazilian-Female_pvc_sp110_s30_sb30_v3.mp3');
+        await playAudioSequence(16, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/ElevenLabs_2025-07-29T02_40_26_Keren-Young-Brazilian-Female_pvc_sp110_s30_sb30_v3.mp3');
+        await playAudioSequence(17, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/ElevenLabs_2025-07-25T22_43_08_Keren-Young-Brazilian-Female_pvc_sp110_s30_sb30_v3.mp3');
         setFlowStep('awaiting_pix_confirmation_response');
         setShowInput(true);
         break;
