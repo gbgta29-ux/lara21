@@ -274,26 +274,21 @@ export default function Home() {
         await showLoadingIndicator(3000, "Gravando áudio...");
         await playAudioSequence(6, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/6.mp3');
         await playAudioSequence(7, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/7.mp3');
-        setFlowStep('awaiting_after_audio_10_response');
-        setShowInput(true);
-        break;
-
-      case 'awaiting_after_audio_10_response':
+        
         await delay(3000);
         await showLoadingIndicator(3000, "Gravando áudio...");
         await playAudioSequence(9, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/9.mp3');
-        setFlowStep('awaiting_after_audio_11_response');
-        setShowInput(true);
-        break;
 
-      case 'awaiting_after_audio_11_response':
         await delay(3000);
         await showLoadingIndicator(3000, "Gravando áudio...");
-        await playAudioSequence(12, 'https://imperiumfragrance.shop/wp-content/uploads/2025/06/12.mp3');
+        await playAudioSequence(10, 'https://imperiumfragrance.shop/wp-content/uploads/2025/07/10.mp3');
+
         setFlowStep('awaiting_after_audio_12_response');
         setShowInput(true);
         break;
 
+      case 'awaiting_after_audio_10_response':
+      case 'awaiting_after_audio_11_response':
       case 'awaiting_after_audio_12_response':
         await delay(3000);
         await showLoadingIndicator(3000);
@@ -463,6 +458,8 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
 
