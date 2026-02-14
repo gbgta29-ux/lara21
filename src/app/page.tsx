@@ -194,7 +194,7 @@ export default function Home() {
     await showLoadingIndicator(2000);
     addMessage({ type: 'image', url: 'https://gvdtvgefzbxunjrtzrdw.supabase.co/storage/v1/object/public/media/3a017g5a1sg_1771095329540.jpg' }, 'bot');
     await showLoadingIndicator(1500);
-    addMessage({ type: 'text', text: `O que você faria com esses peitos, ${userName}? Já tá imaginando minha boca no seu pau?` }, 'bot');
+    addMessage({ type: 'text', text: `O que você faria com essa minha bundinha de 4 pra vc ?, ${userName}? Já tá imaginando minha boca no seu pau?` }, 'bot');
     setFlowStep('awaiting_peitos_reply');
     setShowInput(true);
   };
