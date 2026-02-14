@@ -115,6 +115,9 @@ export default function Home() {
       await showLoadingIndicator(1500);
       addMessage({ type: 'text', text: "Tô esperando, bb. Não me deixa na mão, porque a noite só tá começando..." }, 'bot');
       
+      await showLoadingIndicator(1000);
+      addMessage({ type: 'text', text: "Qual o seu nome?" }, 'bot');
+      
       setShowInput(true);
       setFlowStep('awaiting_name');
     };
@@ -166,7 +169,7 @@ export default function Home() {
 
     const result = await checkPaymentStatus(txId);
 
-    if (result?.status === 'paid' || true) { // Forced for testing as requested in previous turn, keep it or remove it? The prompt says "quando eu clicar em ja paguei vc só finge q ja foi"
+    if (result?.status === 'paid' || true) { // Forced for testing
       fpixelTrack('Purchase', { value: value / 100, currency: 'BRL' });
       if (isUpsell) {
         addMessage({ type: 'text', text: "Pagamento confirmado, gostoso! 🔥 Clica no botão abaixo pra gente conversar no WhatsApp agora mesmo!" }, 'bot');
