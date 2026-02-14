@@ -82,9 +82,8 @@ export default function ChatMessage({ message, isAutoPlaying = false }: ChatMess
           <>
             <div className="flex items-center gap-2.5">
               <Image
-                  src="https://imperiumfragrance.shop/wp-content/uploads/2025/07/foto-de-perfil.jpg"
-                  data-ai-hint="woman profile"
-                  alt="Duda"
+                  src="https://gvdtvgefzbxunjrtzrdw.supabase.co/storage/v1/object/public/media/96rynjza3u_1771097183221.png"
+                  alt="Lara"
                   width={40}
                   height={40}
                   className="shrink-0 rounded-full object-cover aspect-square"
@@ -105,7 +104,6 @@ export default function ChatMessage({ message, isAutoPlaying = false }: ChatMess
               width={300}
               height={300}
               className="rounded-md object-cover"
-              data-ai-hint="sent image"
             />
             <OverlayTimeAndStatus />
           </div>
@@ -117,7 +115,6 @@ export default function ChatMessage({ message, isAutoPlaying = false }: ChatMess
               src={message.url!}
               controls
               className="rounded-md object-cover w-full max-w-[300px]"
-              data-ai-hint="story video"
             />
             <OverlayTimeAndStatus />
           </div>
