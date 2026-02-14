@@ -169,7 +169,7 @@ export default function Home() {
 
     const result = await checkPaymentStatus(txId);
 
-    if (result?.status === 'paid' || true) { // Forced for testing
+    if (result?.status === 'paid') {
       fpixelTrack('Purchase', { value: value / 100, currency: 'BRL' });
       if (isUpsell) {
         addMessage({ type: 'text', text: "Pagamento confirmado, gostoso! 🔥 Clica no botão abaixo pra gente conversar no WhatsApp agora mesmo!" }, 'bot');
@@ -177,10 +177,12 @@ export default function Home() {
       } else {
         await showLoadingIndicator(2000, "Gravando áudio...");
         await playAudioSequence('https://gvdtvgefzbxunjrtzrdw.supabase.co/storage/v1/object/public/media/rukmwzpd7jp_1771035757423.mp3');
-        addMessage({ type: 'text', text: "Amor, acabei de liberar meu número pessoal pra você... Quer pagar só mais R$ 20,00 pra gente conversar por lá? 😏" }, 'bot');
+        addMessage({ type: 'text', text: "Amor, acabei de liberar meu número pessoal pra você... Quer pagar só mais R$ 15,90 pra gente conversar por lá? 😏" }, 'bot');
         setFlowStep('payment_confirmed_awaiting_upsell_choice');
       }
     } else {
+      await showLoadingIndicator(2000, "Gravando áudio...");
+      await playAudioSequence('https://gvdtvgefzbxunjrtzrdw.supabase.co/storage/v1/object/public/media/oydz2jvn6d_1771035757956.mp3');
       addMessage({ type: 'text', text: "Amor, ainda não apareceu aqui pra mim. Tenta verificar se o PIX foi enviado direitinho. 🥺" }, 'bot');
     }
     setIsCheckingPayment(false);
@@ -206,7 +208,7 @@ export default function Home() {
     await playAudioSequence('https://gvdtvgefzbxunjrtzrdw.supabase.co/storage/v1/object/public/media/rukmwzpd7jp_1771035757423.mp3');
     await playAudioSequence('https://gvdtvgefzbxunjrtzrdw.supabase.co/storage/v1/object/public/media/yc1q314vw9_1771035756658.mp3');
     await playAudioSequence('https://gvdtvgefzbxunjrtzrdw.supabase.co/storage/v1/object/public/media/bt5jwg2qmw_1771035756188.mp3');
-    await handleCreatePix(1499);
+    await handleCreatePix(990); // R$ 9,90
   };
 
   const handleUpsellChoice = async (choice: 'yes' | 'no') => {
@@ -215,8 +217,8 @@ export default function Home() {
         addMessage({ type: 'text', text: 'Sim, eu quero!' }, 'user');
         setIsCreatingPix(true);
         await showLoadingIndicator(2000);
-        addMessage({ type: 'text', text: 'Oba! Sabia que você ia querer, amor. Vou gerar o PIX de R$20,00 pra você.' }, 'bot');
-        await handleCreatePix(2000, true);
+        addMessage({ type: 'text', text: 'Oba! Sabia que você ia querer, amor. Vou gerar o PIX de R$15,90 pra você.' }, 'bot');
+        await handleCreatePix(1590, true); // R$ 15,90
         setIsCreatingPix(false);
     } else {
         addMessage({ type: 'text', text: 'Não, obrigado' }, 'user');
@@ -263,7 +265,6 @@ export default function Home() {
         await playAudioSequence('https://gvdtvgefzbxunjrtzrdw.supabase.co/storage/v1/object/public/media/jni8akrs49h_1771035758466.mp3');
         await showLoadingIndicator(1500);
         addMessage({ type: 'text', text: `E aí, ${userName}? O que você achou do meu vídeo? Já tá implorando pra me ter?` }, 'bot');
-        await playAudioSequence('https://gvdtvgefzbxunjrtzrdw.supabase.co/storage/v1/object/public/media/oydz2jvn6d_1771035757956.mp3');
         await showLoadingIndicator(1500);
         addMessage({ type: 'text', text: "eae bb bora ?" }, 'bot');
         setFlowStep('awaiting_bora_button');
@@ -340,9 +341,9 @@ export default function Home() {
               <Button
                   onClick={() => {
                     if (flowStep === 'awaiting_pix_payment' && pixData) {
-                      handleCheckPayment(pixData.transactionId, 1499, false);
+                      handleCheckPayment(pixData.transactionId, 990, false);
                     } else if (flowStep === 'awaiting_upsell_pix_payment' && upsellPixData) {
-                       handleCheckPayment(upsellPixData.transactionId, 2000, true);
+                       handleCheckPayment(upsellPixData.transactionId, 1590, true);
                     }
                   }}
                   disabled={isCheckingPayment}
