@@ -172,7 +172,7 @@ export default function Home() {
     if (result?.status === 'paid') {
       fpixelTrack('Purchase', { value: value / 100, currency: 'BRL' });
       if (isUpsell) {
-        addMessage({ type: 'text', text: "Pagamento confirmado, gostoso! 🔥 Clica no botão abaixo pra gente conversar no WhatsApp agora mesmo!" }, 'bot');
+        addMessage({ type: 'text', text: "Pagamento confirmado, gostoso! 🔥 Clica no botão abaixo pra gente começar agora mesmo!" }, 'bot');
         setFlowStep('upsell_payment_confirmed');
       } else {
         await showLoadingIndicator(2000, "Gravando áudio...");
@@ -375,8 +375,8 @@ export default function Home() {
           {flowStep === 'upsell_payment_confirmed' && (
              <div className="p-4 bg-background border-t border-border/20 flex justify-center">
               <Button asChild className="w-full bg-accent text-accent-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-accent/90">
-                <Link href="https://wa.me/5543999599099?text=oi%20dudaa%2C%20comprei%20sua%20chamadinha%20de%20v%C3%ADdeo" target="_blank">
-                  Conversar no WhatsApp
+                <Link href="https://unrivaled-cascaron-259617.netlify.app/" target="_blank">
+                  Acessar Conteúdo VIP
                 </Link>
               </Button>
             </div>
@@ -385,7 +385,7 @@ export default function Home() {
           {flowStep === 'flow_complete_video_only' && (
              <div className="p-4 bg-background border-t border-border/20 flex justify-center">
               <Button asChild className="w-full bg-accent text-accent-foreground font-bold text-lg py-6 rounded-full shadow-lg hover:bg-accent/90">
-                <Link href="https://marvelous-parfait-3475a8.netlify.app/" target="_blank">
+                <Link href="https://unrivaled-cascaron-259617.netlify.app/" target="_blank">
                   Iniciar chamada de vídeo
                 </Link>
               </Button>
